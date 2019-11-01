@@ -108,6 +108,11 @@
             "<?php\n".
             "   class ".$this->getName()."DAO".
             "   {".
+            ":insert".
+            ":update".
+            ":delete".
+            ":selectAll".
+            ":selects".
             "   }\n".
             "?>";;
             $fp = fopen($dir.'dao'.DIRECTORY_SEPARATOR.$this->getName().'DAO.php', 'w');
