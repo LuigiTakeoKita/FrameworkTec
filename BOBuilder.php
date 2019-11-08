@@ -1,6 +1,10 @@
 <?php
     class BOBuilder
     {
+        private function generateSelects($table)
+        {
+            return "";
+        }
         public function createBO($dir)
         {
             $bo = 
@@ -27,8 +31,10 @@
             "       {\n".
             "           return \$dao->selectAll();".
             "       }".
+            ":selects".
             "   }\n".
             "?>";;
+            $bo = str_replace(":selects", $this->generateSelects($table), $bo);
             $fp = fopen($dir.'bo'.DIRECTORY_SEPARATOR.$this->getName().'BO.php', 'w');
             fwrite($fp, $bo);
             fclose($fp);

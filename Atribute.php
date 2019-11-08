@@ -4,11 +4,13 @@
         private $name;
         private $type;
         private $foreignKey;
-        public function __construct ($name = "number", $type = "int", $foreignKey = "")
+        private $reference;
+        public function __construct ($name = "number", $type = "int", $foreignKey = "", $reference="")
         {
             $this->name = $name;
             $this->type = $type;
             $this->foreignKey = $foreignKey;
+            $this->reference = $reference;
          }
         /**
          * Get the value of name
@@ -62,5 +64,24 @@
             $this->foreignKey = $foreignKey;
             return $this;
          }
+
+        /**
+         * Get the value of reference
+         */ 
+        public function getReference()
+        {
+                return $this->reference;
+        }
+        /**
+         * Set the value of reference
+         *
+         * @return  self
+         */ 
+        public function setReference($reference)
+        {
+                $this->reference = $reference;
+
+                return $this;
+        }
      }
  ?>

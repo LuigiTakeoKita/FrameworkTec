@@ -40,7 +40,7 @@
         {
             $dto = 
             "<?php\n".
-            "   class ".$table->getName().
+            "   class ".ucfirst($table->getName()).
             "   {".
             ":atributes".
             ":getset".
@@ -50,7 +50,7 @@
             $dto = str_replace(":atributes", $this->generateAttributes($table), $dto);
             $dto = str_replace(":getset", $this->generateGetSet($table), $dto);
             $dto = str_replace(":toString", $this->generateToString($table), $dto);
-            $fp = fopen($dir.'dto'.DIRECTORY_SEPARATOR.$table->getName().'.php', 'w');
+            $fp = fopen($dir.'dto'.DIRECTORY_SEPARATOR.ucfirst($table->getName()).'.php', 'w');
             fwrite($fp, $dto);
             fclose($fp);
          }

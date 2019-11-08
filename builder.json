@@ -20,5 +20,30 @@
             "test/:string": "testeString"
         },
         "errorPage": "http://localhost/Projetos/ComposerTests/view/404.php"
+    },
+    "class":{
+        "nome":["asd"]
+    },
+    "tables":{
+        "tabela":[
+            {
+                "id":"int"
+            },
+            {
+                "tabela2_id":"INT",
+                "id":"tabela2"
+            },
+            {
+                "nome":"str"
+            }
+        ],
+        "tabela2":[
+            {
+                "id":"int"
+            },
+            {
+                "nome":"str"
+            }
+        ]
     }
 }
