@@ -21,8 +21,9 @@
         },
         "errorPage": "http://localhost/Projetos/ComposerTests/view/404.php"
     },
-    "class":{
-        "nome":["asd"]
+    "classes":{
+        "nome":["asd"],
+        "nome2":["eqwe"]
     },
     "tables":{
         "tabela":[

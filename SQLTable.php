@@ -1,5 +1,5 @@
 <?php
-    class Table
+    class SQLTable
     {
         private $name;
         private $atributes;

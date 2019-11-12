@@ -5,7 +5,7 @@
         {
             $stri = "";
             foreach ($table->getAtributes() as $attr) {
-                $stri .= "       private $". $attr->getName() . ";\n";
+                $stri .= "\t\tprivate $". $attr->getName() . ";\n";
             }
             return $stri;
          }
@@ -14,25 +14,25 @@
             $stri = "";
             foreach ($table->getAtributes() as $attr) {
                 $stri .= 
-                "       public function get". ucfirst($attr->getName()) . "(){\n".
-                "           return \$this-> ". $attr. ";\n".
-                "       }\n";
+                "\t\tpublic function get". ucfirst($attr->getName()) . "(){\n".
+                "\t\t\treturn \$this-> ". $attr->getName(). ";\n".
+                "\t\t }\n";
                 $stri .= 
-                "       public function set". ucfirst($attr->getName()) . "($". $attr ."){\n".
-                "           \$this-> ". $attr. " = \$". $attr. ";\n".
-                "       }\n";
+                "\t\tpublic function set". ucfirst($attr->getName()) . "($". $attr->getName() ."){\n".
+                "\t\t\t\$this-> ". $attr->getName(). " = \$". $attr->getName(). ";\n".
+                "\t\t }\n";
             }
             return $stri;
          }
         private function generateToString($table)
         {	
             $stri = 
-            "       public function __toString(){\n".
-            "           return\n";
+            "\t\tpublic function __toString(){\n".
+            "\t\t\treturn\n";
             for ($i = 0; $i < count($table->getAtributes()); $i++) {
-                $stri .= "              '| ". $table->getAtributes()[$i]->getName(). ' = \'. $this-> '. $table->getAtributes()[$i]->getName(). ".' '";
-                if ($i != count($table->getAtributes()) - 1) $stri .= ". \n    ";
-                else $stri .= ". '|';\n }";
+                $stri .= "\t\t\t\t'| ". $table->getAtributes()[$i]->getName(). ' = \'. $this-> '. $table->getAtributes()[$i]->getName(). ".' '";
+                if ($i != count($table->getAtributes()) - 1) $stri .= ". \n";
+                else $stri .= ". '|';\n\t\t }\n";
             }
             return $stri;
          }
@@ -40,12 +40,12 @@
         {
             $dto = 
             "<?php\n".
-            "   class ".ucfirst($table->getName()).
-            "   {".
+            "\tclass ".ucfirst($table->getName()).
+            "\t{\n".
             ":atributes".
             ":getset".
             ":toString".
-            "   }\n".
+            "\t }\n".
             "?>";
             $dto = str_replace(":atributes", $this->generateAttributes($table), $dto);
             $dto = str_replace(":getset", $this->generateGetSet($table), $dto);

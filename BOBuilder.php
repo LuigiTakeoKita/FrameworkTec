@@ -1,27 +1,23 @@
 <?php
     class BOBuilder
     {
-        private function generateSelects($table)
-        {
-            return "";
-        }
-        public function createBO($dir)
+        public function createBO($dir, $table)
         {
             $bo = 
             "<?php\n".
-            "   class ".$this->getName()."BO".
+            "   class ".$table->getName()."BO".
             "   {".
             "       private \$dao;\n".
             "       public function __construct(\$dao){".
             "           \$this->dao = \$dao;".
             "       }\n".
-            "       public function insert(".strtolower($this->getName())." = null)\n".
+            "       public function insert(".$table->getName()." = null)\n".
             "       {\n".
-            "           \$dao->insert(".strtolower($this->getName()).");".
+            "           \$dao->insert(".$table->getName().");".
             "       }".
-            "       public function update(".strtolower($this->getName())." = null)\n".
+            "       public function update(".$table->getName()." = null)\n".
             "       {\n".
-            "           \$dao->update(".strtolower($this->getName()).");".
+            "           \$dao->update(".$table->getName().");".
             "       }".
             "       public function delete(\$id) = 0)\n".
             "       {\n".
@@ -31,11 +27,9 @@
             "       {\n".
             "           return \$dao->selectAll();".
             "       }".
-            ":selects".
             "   }\n".
-            "?>";;
-            $bo = str_replace(":selects", $this->generateSelects($table), $bo);
-            $fp = fopen($dir.'bo'.DIRECTORY_SEPARATOR.$this->getName().'BO.php', 'w');
+            "?>";
+            $fp = fopen($dir.'bo'.DIRECTORY_SEPARATOR.ucfirst($table->getName()).'BO.php', 'w');
             fwrite($fp, $bo);
             fclose($fp);
          }

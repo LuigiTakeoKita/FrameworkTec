@@ -3,16 +3,22 @@
     require_once "Folders.php";
     require_once "Conection.php";
     require_once "Routes.php";
+    require_once "Atribute.php";
+    require_once "SQLTable.php";
+    require_once "DTOBuilder.php";
+    require_once "DAOBuilder.php";
+    require_once "BOBuilder.php";
+    require_once "SQLReader.php";
     class Builder
     {
         public function init()
         {
             if(file_exists('builder.json')){
-                mkdir("src", 0700);
-                $dir = getcwd(). DIRECTORY_SEPARATOR. "src". DIRECTORY_SEPARATOR;
                 $fjosn = file_get_contents('builder.json', 'r');
                 $json = json_decode($fjosn, true);
                 $info = new Informations($json['projectName'], $json['description']);
+                mkdir($info->getProjectName(), 0700);
+                $dir = getcwd(). DIRECTORY_SEPARATOR.$info->getProjectName(). DIRECTORY_SEPARATOR;
                 $info->createREADME($dir);
                 $defaultsFolders = [
                     "controller",
@@ -36,6 +42,31 @@
                     $conflag=true;
                  }
                 $routes = null;
+                if(array_key_exists('classes',$json)){
+                    $dtob = new DTOBuilder;
+                    foreach ($json['classes'] as $key => $value) {
+                        $table = new SQLTable;
+                        $table->setName(strtolower($key));
+                        foreach ($value as $key2 => $value2) {
+                            $atr = new Atribute;
+                            $atr->setName(strtolower($value2));
+                            $table->addAtribute($atr);
+                        }
+                        $dtob->createDTO($dir, $table);
+                    }
+                 }
+                if(array_key_exists('tables',$json)){
+                    $sql = new SQLReader;
+                    $arr = $sql->read($json['tables']);
+                    $dtob = new DTOBuilder();
+                    $daob = new DAOBuilder();
+                    $bob = new BOBuilder();
+                    foreach ($arr as $key => $value) {
+                        $dtob->createDTO($dir, $value);
+                        $daob->createDAO($dir, $value);
+                        // $bob->createBO($dir, $value);
+                    }
+                 }
                 if(array_key_exists('routes', $json)){
                     $routes = new Routes($json['routes']['defaults'], $json['routes']['errorPage']);
                     $routes->createHtAccess($dir);
@@ -45,9 +76,11 @@
                  }
                 $this->createController($dir, $conflag, $routes);
                 $this->createIndex($dir, $routes);
+                return $dir;
              }else{
                 print("Error 404: file not found.");
-             }    
+                return "";
+             }
          }
         private function createController($dir, $con, $routes)
         {
