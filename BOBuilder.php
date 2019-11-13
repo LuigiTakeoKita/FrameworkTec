@@ -5,30 +5,25 @@
         {
             $bo = 
             "<?php\n".
-            "   class ".$table->getName()."BO".
-            "   {".
-            "       private \$dao;\n".
-            "       public function __construct(\$dao){".
-            "           \$this->dao = \$dao;".
-            "       }\n".
-            "       public function insert(".$table->getName()." = null)\n".
-            "       {\n".
-            "           \$dao->insert(".$table->getName().");".
-            "       }".
-            "       public function update(".$table->getName()." = null)\n".
-            "       {\n".
-            "           \$dao->update(".$table->getName().");".
-            "       }".
-            "       public function delete(\$id) = 0)\n".
-            "       {\n".
-            "           \$dao->delete(\$id);".
-            "       }".
-            "       public function selectAll()\n".
-            "       {\n".
-            "           return \$dao->selectAll();".
-            "       }".
-            "   }\n".
-            "?>";
+            "\tclass ".$table->getName()."BO {\n".
+            "\t\tprivate \$dao;\n".
+            "\t\tpublic function __construct(\$dao) {\n".
+            "\t\t\t\$this->dao = \$dao;\n".
+            "\t\t }\n".
+            "\t\tpublic function insert(\$".$table->getName()." = null) {\n".
+            "\t\t\t\$dao->insert(\$".$table->getName().");\n".
+            "\t\t }\n".
+            "\t\tpublic function update(\$".$table->getName()." = null) {\n".
+            "\t\t\t\$dao->update(\$".$table->getName().");\n".
+            "\t\t }\n".
+            "\t\tpublic function delete(\$".$table->getName()." = null) {\n".
+            "\t\t\t\$dao->delete(\$".$table->getName().");\n".
+            "\t\t }\n".
+            "\t\tpublic function selectAll() {\n".
+            "\t\t\treturn \$dao->selectAll();\n".
+            "\t\t }\n".
+            "\t }\n".
+            " ?>";
             $fp = fopen($dir.'bo'.DIRECTORY_SEPARATOR.ucfirst($table->getName()).'BO.php', 'w');
             fwrite($fp, $bo);
             fclose($fp);

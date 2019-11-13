@@ -64,7 +64,7 @@
                     foreach ($arr as $key => $value) {
                         $dtob->createDTO($dir, $value);
                         $daob->createDAO($dir, $value);
-                        // $bob->createBO($dir, $value);
+                        $bob->createBO($dir, $value);
                     }
                  }
                 if(array_key_exists('routes', $json)){

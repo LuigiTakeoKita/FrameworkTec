@@ -105,18 +105,18 @@
         {
             $pdo = 
             "<?php\n".
-            "   class Conection{\n".
-            "       public static \$instance;\n".
-            "       private function __construct(){}\n".
-            "       public static function getInstance(){\n".
-            "           if (!isset(self::\$instance)) {\n".
-            "               self::\$instance = new PDO('".$this->getDriver().":host=".$this->getHost().";dbname=".$this->getDbName()."', \"".$this->getUsername()."\",\"".$this->getPassword()."\");\n".
-            "               self::\$instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);\n".
-            "           }\n".
-            "           return self::\$instance;\n".
-            "       }\n".
-            "   }\n".
-            "?>";
+            "\tclass Conection {\n".
+            "\t\tpublic static \$instance;\n".
+            "\t\tprivate function __construct(){}\n".
+            "\t\tpublic static function getInstance(){\n".
+            "\t\t\tif (!isset(self::\$instance)) {\n".
+            "\t\t\t\tself::\$instance = new PDO('".$this->getDriver().":host=".$this->getHost().";dbname=".$this->getDbName()."', \"".$this->getUsername()."\",\"".$this->getPassword()."\");\n".
+            "\t\t\t\tself::\$instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);\n".
+            "\t\t\t }\n".
+            "\t\t\treturn self::\$instance;\n".
+            "\t\t }\n".
+            "\t }\n".
+            " ?>";
             $fp = fopen($dir.'conection'.DIRECTORY_SEPARATOR.'Conection.php', 'w');
             fwrite($fp, $pdo);
             fclose($fp);

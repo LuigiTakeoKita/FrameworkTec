@@ -12,16 +12,21 @@
         private function generateGetSet($table)
         {	
             $stri = "";
-            foreach ($table->getAtributes() as $attr) {
+            foreach ($table->getAtributes() as $atr) {
+                $var = "";
+                if ($atr->getForeignKey()=="") {
+                    $var = $atr->getName();
+                 } else {
+                    $var = $atr->getForeignKey();
+                  }
                 $stri .= 
-                "\t\tpublic function get". ucfirst($attr->getName()) . "(){\n".
-                "\t\t\treturn \$this-> ". $attr->getName(). ";\n".
+                "\t\tpublic function get". ucfirst($var) . "(){\n".
+                "\t\t\treturn \$this-> ". $var. ";\n".
+                "\t\t }\n".
+                "\t\tpublic function set". ucfirst($var) . "($". $var ."){\n".
+                "\t\t\t\$this-> ". $var. " = \$". $var. ";\n".
                 "\t\t }\n";
-                $stri .= 
-                "\t\tpublic function set". ucfirst($attr->getName()) . "($". $attr->getName() ."){\n".
-                "\t\t\t\$this-> ". $attr->getName(). " = \$". $attr->getName(). ";\n".
-                "\t\t }\n";
-            }
+             }
             return $stri;
          }
         private function generateToString($table)
@@ -40,8 +45,7 @@
         {
             $dto = 
             "<?php\n".
-            "\tclass ".ucfirst($table->getName()).
-            "\t{\n".
+            "\tclass ".ucfirst($table->getName())." {\n".
             ":atributes".
             ":getset".
             ":toString".
