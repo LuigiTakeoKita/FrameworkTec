@@ -21,10 +21,10 @@
                   }
                 $stri .= 
                 "\t\tpublic function get". ucfirst($var) . "(){\n".
-                "\t\t\treturn \$this-> ". $var. ";\n".
+                "\t\t\treturn \$this->". $var. ";\n".
                 "\t\t }\n".
                 "\t\tpublic function set". ucfirst($var) . "($". $var ."){\n".
-                "\t\t\t\$this-> ". $var. " = \$". $var. ";\n".
+                "\t\t\t\$this->". $var. " = \$". $var. ";\n".
                 "\t\t }\n";
              }
             return $stri;
@@ -35,7 +35,11 @@
             "\t\tpublic function __toString(){\n".
             "\t\t\treturn\n";
             for ($i = 0; $i < count($table->getAtributes()); $i++) {
-                $stri .= "\t\t\t\t'| ". $table->getAtributes()[$i]->getName(). ' = \'. $this-> '. $table->getAtributes()[$i]->getName(). ".' '";
+                if($table->getAtributes()[$i]->getForeignKey() == ""){
+                    $stri .= "\t\t\t\t'| ". $table->getAtributes()[$i]->getName(). ' = \'. $this->'. $table->getAtributes()[$i]->getName(). ".' '";
+                 } else {
+                    $stri .= "\t\t\t\t'| ". $table->getAtributes()[$i]->getForeignKey(). ' = \'. $this->'. $table->getAtributes()[$i]->getForeignKey(). ".' '";
+                  }
                 if ($i != count($table->getAtributes()) - 1) $stri .= ". \n";
                 else $stri .= ". '|';\n\t\t }\n";
             }

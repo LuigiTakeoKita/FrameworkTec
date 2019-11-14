@@ -15,7 +15,7 @@
                     $arr = array_keys($value2);
                     $atr = new Atribute;
                     $atr->setName(strtolower($arr[0]));
-                    $atr->setType(strtolower($value2[$arr[0]]));
+                    $atr->setType(strtoupper($value2[$arr[0]]));
                     if(sizeof($arr)>1){
                         $atr->setReference(strtolower($arr[1]));
                         $atr->setForeignKey(strtolower($value2[$arr[1]]));

@@ -24,7 +24,7 @@
             $binds = "";
             foreach ($atributes as $key => $value) {
                 $binds .= "\t\t\t\t\$stmt->bindParam(':".$value->getName().
-                "', \$".$value->getName().", PDO::PARAM_".strtoupper($value->getType()).");\n";
+                "', \$".$value->getName().", PDO::PARAM_".$value->getType().");\n";
              }
             return $binds;
          }
@@ -46,8 +46,8 @@
         private function generateInsert($table)
         {
             $insert =
-            "\t\tpublic function inserir(\$".$table->getName()."){\n".
-            "\t\t\tif (\$inst instanceof ".$table->getName().") {\n".
+            "\t\tpublic function insert(\$".$table->getName()."){\n".
+            "\t\t\tif (\$".$table->getName()." instanceof ".ucfirst($table->getName()).") {\n".
             "\t\t\t\t\$stmt = Conection::getInstance()->prepare('INSERT INTO ".$table->getName()." (:fields) VALUES(:values)');\n".
             ":binds".
             ":convertions".
@@ -80,7 +80,7 @@
         {
             $update =
             "\t\tpublic function update(\$".$table->getName()."){\n".
-            "\t\t\tif (\$inst instanceof ".$table->getName().") {\n".
+            "\t\t\tif (\$".$table->getName()." instanceof ".ucfirst($table->getName()).") {\n".
             "\t\t\t\t\$stmt = Conection::getInstance()->prepare('UPDATE ".$table->getName()." SET :updates WHERE :where');\n".
             ":binds".
             ":convertions".
@@ -101,8 +101,8 @@
         {
             $delete = 
             "\t\tpublic function delete(\$".$table->getName()."){\n".
-            "\t\t\tif (\$inst instanceof ".$table->getName().") {\n".
-            "\t\t\t\t\$stmt = Conection::getInstance()->prepare('DELETE FROM ".$table->getName()." WHERE :idold = ::idnewm');\n".
+            "\t\t\tif (\$".$table->getName()." instanceof ".ucfirst($table->getName()).") {\n".
+            "\t\t\t\t\$stmt = Conection::getInstance()->prepare('DELETE FROM ".$table->getName()." WHERE :where');\n".
             ":binds".
             ":convertions".
             "\t\t\t\t\$stmt->execute();\n".
@@ -110,19 +110,32 @@
             "\t\t }\n";
             $atributes = $table->getAtributes();
             $id = $atributes[0];
-            $delete = str_replace(":idold", $id->getName(), $delete);
-            $delete = str_replace(":idnewm", $id->getName(), $delete);
+            $delete = str_replace(":where", $this->generateWhere($id), $delete);
             $delete = str_replace(":binds", $this->generateBinds([$id]), $delete);
             $table->setAtributes([$id]);
             $delete = str_replace(":convertions", $this->generateConvertions($table), $delete);
+            $table->setAtributes($atributes);
             return $delete;
          }
-        private function generateSets($table)
+        private function generateSets($table, $ntabs)
         {
+            $tabs="";
+            for ($i=0; $i < $ntabs; $i++) { 
+                $tabs .= "\t";
+            }
             $sets = "";
             $name = $table->getName();
             foreach ($table->getAtributes() as $key => $value) {
-                $sets .= "\t\t\t\t\$".$name."->set".ucfirst($value->getName())."(\$row['".$value->getName()."']);\n";
+                if ($value->getForeignKey()=="") {
+                    $sets .= $tabs."\$".$name."->set".ucfirst($value->getName())."(\$row['".$value->getName()."']);\n";
+                 } else {
+                    $sets .= 
+                    $tabs."\$".$value->getForeignKey()." = new ".ucfirst($value->getForeignKey()).";\n".
+                    $tabs."\$".$value->getForeignKey()."->set".$value->getReference()."(\$row['".$value->getName()."']);\n".
+                    $tabs."\$".$value->getForeignKey()." = \$".$value->getForeignKey()."dao->selectPK(\$".$value->getForeignKey().");\n".
+                    $tabs."\$".$name."->set".ucfirst($value->getForeignKey())."(\$".$value->getForeignKey().");\n";
+                  }
+                
             }   
             return $sets;
          }
@@ -131,7 +144,8 @@
             $selectAll =
             "\t\tpublic function selectAll(){\n".
             "\t\t\t\$query = Conection::getInstance()->query(\"SELECT * FROM ".$table->getName().";\");\n".
-			"\t\t\t\$arr=array();\n".
+            "\t\t\t\$arr=array();\n".
+            ":dao".
 			"\t\t\twhile (\$row = \$query->fetch(PDO::FETCH_ASSOC)) {\n".
 			"\t\t\t\t\$".$table->getName()." = new ".ucfirst($table->getName())."();\n".
 			":sets".
@@ -139,25 +153,62 @@
 			"\t\t\t }\n".
             "\t\t\treturn \$arr;\n".
             "\t\t }\n";
-            $selectAll = str_replace(":sets", $this->generateSets($table), $selectAll);
+            $dao = "";
+            foreach ($table->getAtributes() as $key => $value) {
+                if($value->getForeignKey() != ""){
+                    $dao .= "\t\t\t\$".$value->getForeignKey()."dao = new ".ucfirst($value->getForeignKey())."DAO;\n";
+                }
+            }
+            $selectAll = str_replace(":dao", $dao, $selectAll);
+            $selectAll = str_replace(":sets", $this->generateSets($table, 4), $selectAll);
             return $selectAll;
+         }
+        private function generateSelectPK($table)
+        {
+            $selectpk = 
+            "\t\tpublic function selectPK(\$".$table->getName()."){\n".
+            "\t\t\tif (\$".$table->getName()." instanceof ".ucfirst($table->getName()).") {\n".
+            "\t\t\t\t\$stmt = Conection::getInstance()->prepare(\"SELECT * FROM ".$table->getName()." WHERE :where;\");\n".
+            ":binds".
+            ":convertions".
+            "\t\t\t\t\$stmt->execute();\n".
+            "\t\t\t\t\$row = \$stmt->fetch(PDO::FETCH_ASSOC);\n".
+            "\t\t\t\tif (\$row != false) {\n".
+            "\t\t\t\t\t\$".$table->getName()." = new ".ucfirst($table->getName())."();\n".
+            ":sets".
+            "\t\t\t\t\treturn \$".$table->getName().";\n".
+            "\t\t\t\t }\n".
+            "\t\t\t }\n".
+            "\t\t\treturn null;\n".
+            "\t\t }\n";
+            $atributes = $table->getAtributes();
+            $id = $atributes[0];
+            $selectpk = str_replace(":sets", $this->generateSets($table, 5), $selectpk);
+            $selectpk = str_replace(":where", $this->generateWhere($id), $selectpk);
+            $selectpk = str_replace(":binds", $this->generateBinds([$id]), $selectpk);
+            $table->setAtributes([$id]);
+            $selectpk = str_replace(":convertions", $this->generateConvertions($table), $selectpk);
+            $table->setAtributes($atributes);
+            return $selectpk;
          }
         public function createDAO($dir, $table)
         {
             $dao = 
             "<?php\n".
-            "\trequire_once \"..".DIRECTORY_SEPARATOR."conection".DIRECTORY_SEPARATOR."Conection.php\";\n".
+            "\trequire_once \"../autoload.php\";\n".
             "\tclass ".ucfirst($table->getName())."DAO {\n".
             ":insert".
             ":update".
             ":delete".
             ":selectAll".
+            ":selectPK".
             "\t }\n".
             "?>";
             $dao = str_replace(":insert", $this->generateInsert($table), $dao);
             $dao = str_replace(":update", $this->generateUpdate($table), $dao);
             $dao = str_replace(":delete", $this->generateDelete($table), $dao);
             $dao = str_replace(":selectAll", $this->generateSelectAll($table), $dao);
+            $dao = str_replace(":selectPK", $this->generateSelectPK($table), $dao);
             $fp = fopen($dir.'dao'.DIRECTORY_SEPARATOR.ucfirst($table->getName()).'DAO.php', 'w');
             fwrite($fp, $dao);
             fclose($fp);
