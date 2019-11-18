@@ -9,6 +9,7 @@
     require_once "DAOBuilder.php";
     require_once "BOBuilder.php";
     require_once "SQLReader.php";
+    require_once "InterfaceBuilder.php";
     class Builder
     {
         public function init()
@@ -28,6 +29,9 @@
                     "view",
                     "conection"
                  ];
+                if(array_key_exists('tables',$json)){
+                    array_push($defaultsFolders, "interface");
+                } 
                 if(array_key_exists('folders', $json)){
                     $folders = new Folders(array_merge($defaultsFolders, $json['folders']));    
                  }else{
@@ -56,6 +60,8 @@
                     }
                  }
                 if(array_key_exists('tables',$json)){
+                    $interfaceB = new InterfaceBuilder;
+                    $interfaceB->createInteface($dir);
                     $sql = new SQLReader;
                     $arr = $sql->read($json['tables']);
                     $dtob = new DTOBuilder();
@@ -76,7 +82,7 @@
                  }
                 $this->createController($dir, $conflag, $routes);
                 $this->createIndex($dir, $routes);
-                return $dir;
+                return $info->getProjectName();
              }else{
                 print("Error 404: file not found.");
                 return "";

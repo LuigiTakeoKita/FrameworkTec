@@ -5,10 +5,11 @@
         {
             $bo = 
             "<?php\n".
-            "\tclass ".$table->getName()."BO {\n".
+            "\trequire_once \"../autoload.php\";\n".
+            "\tclass ".ucfirst($table->getName())."BO implements TableInterface {\n".
             "\t\tprivate \$dao;\n".
-            "\t\tpublic function __construct(\$dao) {\n".
-            "\t\t\t\$this->dao = \$dao;\n".
+            "\t\tpublic function __construct() {\n".
+            "\t\t\t\$this->dao = ".ucfirst($table->getName())."DAO;\n".
             "\t\t }\n".
             "\t\tpublic function insert(\$".$table->getName()." = null) {\n".
             "\t\t\t\$dao->insert(\$".$table->getName().");\n".

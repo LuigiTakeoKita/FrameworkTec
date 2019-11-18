@@ -1,6 +1,15 @@
 <?php
     class DTOBuilder
     {
+        private function generateAutoload($table)
+        {
+            foreach ($table->getatributes() as $key => $value) {
+                if($value->getForeignKey()!=""){
+                    return "\trequire_once \"../autoload.php\";\n";
+                 }
+             }
+            return "";
+         }
         private function generateAttributes($table)
         {
             $stri = "";
@@ -14,17 +23,23 @@
             $stri = "";
             foreach ($table->getAtributes() as $atr) {
                 $var = "";
+                $set = "";
                 if ($atr->getForeignKey()=="") {
                     $var = $atr->getName();
+                    $set = "\t\t\t\$this->". $var. " = \$". $var. ";\n";
                  } else {
                     $var = $atr->getForeignKey();
+                    $set = 
+                    "\t\t\tif(".$var." instanceof ".ucfirst($var).") {\n".
+                    "\t\t\t\t\$this->". $var. " = \$". $var. ";\n".
+                    "\t\t\t }";
                   }
                 $stri .= 
                 "\t\tpublic function get". ucfirst($var) . "(){\n".
                 "\t\t\treturn \$this->". $var. ";\n".
                 "\t\t }\n".
                 "\t\tpublic function set". ucfirst($var) . "($". $var ."){\n".
-                "\t\t\t\$this->". $var. " = \$". $var. ";\n".
+                $set.
                 "\t\t }\n";
              }
             return $stri;
@@ -49,12 +64,14 @@
         {
             $dto = 
             "<?php\n".
+            ":autoload".
             "\tclass ".ucfirst($table->getName())." {\n".
             ":atributes".
             ":getset".
             ":toString".
             "\t }\n".
-            "?>";
+            " ?>";
+            $dto = str_replace(":autoload", $this->generateAutoload($table), $dto);
             $dto = str_replace(":atributes", $this->generateAttributes($table), $dto);
             $dto = str_replace(":getset", $this->generateGetSet($table), $dto);
             $dto = str_replace(":toString", $this->generateToString($table), $dto);

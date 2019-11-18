@@ -196,14 +196,14 @@
             $dao = 
             "<?php\n".
             "\trequire_once \"../autoload.php\";\n".
-            "\tclass ".ucfirst($table->getName())."DAO {\n".
+            "\tclass ".ucfirst($table->getName())."DAO implements TableInterface {\n".
             ":insert".
             ":update".
             ":delete".
             ":selectAll".
             ":selectPK".
             "\t }\n".
-            "?>";
+            " ?>";
             $dao = str_replace(":insert", $this->generateInsert($table), $dao);
             $dao = str_replace(":update", $this->generateUpdate($table), $dao);
             $dao = str_replace(":delete", $this->generateDelete($table), $dao);
