@@ -32,7 +32,7 @@
         public function createFolders($dir)
         {
             foreach ($this->getFolders() as $key => $value) {
-                if (!file_exists($value)) {
+                if (! (file_exists($dir. $value) and is_dir($dir. $value))) {
                     mkdir($dir.$value, 0700);
                  }
              }

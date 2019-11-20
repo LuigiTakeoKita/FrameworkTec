@@ -18,8 +18,8 @@
                 $fjosn = file_get_contents('builder.json', 'r');
                 $json = json_decode($fjosn, true);
                 $info = new Informations($json['projectName'], $json['description']);
-                mkdir($info->getProjectName(), 0700);
                 $dir = getcwd(). DIRECTORY_SEPARATOR.$info->getProjectName(). DIRECTORY_SEPARATOR;
+                if (! (file_exists($dir) and is_dir($dir))) mkdir($info->getProjectName(), 0700);
                 $info->createREADME($dir);
                 $defaultsFolders = [
                     "controller",
