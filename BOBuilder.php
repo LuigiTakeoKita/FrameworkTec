@@ -23,6 +23,9 @@
             "\t\tpublic function selectAll() {\n".
             "\t\t\treturn \$dao->selectAll();\n".
             "\t\t }\n".
+            "\t\tpublic function selectPK(\$".$table->getName()." = null) {\n".
+            "\t\t\treturn \$dao->selectPK(\$".$table->getName().");\n".
+            "\t\t }\n".
             "\t }\n".
             " ?>";
             $fp = fopen($dir.'bo'.DIRECTORY_SEPARATOR.ucfirst($table->getName()).'BO.php', 'w');

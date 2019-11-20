@@ -10,6 +10,7 @@
     require_once "BOBuilder.php";
     require_once "SQLReader.php";
     require_once "InterfaceBuilder.php";
+    require_once "ControllerBuilder.php";
     class Builder
     {
         public function init()
@@ -59,6 +60,7 @@
                         $dtob->createDTO($dir, $table);
                     }
                  }
+                $arr = [];
                 if(array_key_exists('tables',$json)){
                     $interfaceB = new InterfaceBuilder;
                     $interfaceB->createInteface($dir);
@@ -80,51 +82,14 @@
                     $routes->createRoutes($dir);
                     $routes->createRoutesJson($dir);
                  }
-                $this->createController($dir, $conflag, $routes);
+                $contBuilder = new ControllerBuilder;
+                $contBuilder->createController($dir, $conflag, $routes, $arr);
                 $this->createIndex($dir, $routes);
                 return $info->getProjectName();
              }else{
                 print("Error 404: file not found.");
                 return "";
              }
-         }
-        private function createController($dir, $con, $routes)
-        {
-            $controller = 
-            "<?php\n".
-            "    require_once \"../autoload.php\";\n".
-            "    class Controller\n".
-            "    {\n";
-            if ($con) {
-                $controller .= 
-                "        public function getPdo()\n".
-                "        {\n".
-                "             return Conection::getInstance();\n".
-                "        }\n";
-             }
-            if ($routes != null) {
-                foreach ($routes->getRoutes() as $key => $value) {
-                    if($value[0] == "Controller"){
-                        if (preg_match('/:int$|:string$|:float$/', $key)) {
-                            $controller .= 
-                            "        public function ".$value[1]."(\$var)\n".
-                            "        {\n".
-                            "            echo \"".$value[1].": \".\$var;\n".
-                            "        }\n";
-                         }else{
-                            $controller .= 
-                            "        public function ".$value[1]."()\n".
-                            "        {\n".
-                            "            echo \"".$value[1]."\";\n".
-                            "        }\n";
-                         }
-                     }
-                 }
-             }
-            $controller .= "    }\n?>";
-            $fp = fopen($dir.'controller'.DIRECTORY_SEPARATOR.'Controller.php', 'w');
-            fwrite($fp, $controller);
-            fclose($fp);
          }
         private function createIndex($dir, $routes)
         {

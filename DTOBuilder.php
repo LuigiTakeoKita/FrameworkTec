@@ -30,7 +30,7 @@
                  } else {
                     $var = $atr->getForeignKey();
                     $set = 
-                    "\t\t\tif(".$var." instanceof ".ucfirst($var).") {\n".
+                    "\t\t\tif(\$".$var." instanceof ".ucfirst($var).") {\n".
                     "\t\t\t\t\$this->". $var. " = \$". $var. ";\n".
                     "\t\t\t }";
                   }

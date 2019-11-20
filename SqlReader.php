@@ -28,28 +28,3 @@
          }
      }
  ?>
- <!-- 
-     ao pegar os valores da tabela colocar tudo em minusculo
-    {
-        "tabela":[
-            {
-                "id":"int"
-            },
-            {
-                "tabela2_id":"INT",
-                "id":"tabela2"
-            },
-            {
-                "nome":"str"
-            }
-        ],
-        "tabela2":[
-            {
-                "id":"int"
-            },
-            {
-                "nome":"str"
-            }
-        ]
-    }
-  -->
