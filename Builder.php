@@ -11,6 +11,10 @@
     require_once "SQLReader.php";
     require_once "InterfaceBuilder.php";
     require_once "ControllerBuilder.php";
+    require_once "HeaderBuilder.php";
+    require_once "FooterBuilder.php";
+    require_once "SelectViewBuilder.php";
+    require_once "TableViewBuilder.php";
     class Builder
     {
         public function init()
@@ -28,7 +32,8 @@
                     "dao",
                     "dto",
                     "view",
-                    "conection"
+                    "conection",
+                    "css"
                  ];
                 if(array_key_exists('tables',$json)){
                     array_push($defaultsFolders, "interface");
@@ -69,11 +74,19 @@
                     $dtob = new DTOBuilder();
                     $daob = new DAOBuilder();
                     $bob = new BOBuilder();
+                    $svb = new SelectViewBuilder;
+                    $tvb = new TableViewBuilder;
                     foreach ($arr as $key => $value) {
                         $dtob->createDTO($dir, $value);
                         $daob->createDAO($dir, $value);
                         $bob->createBO($dir, $value);
+                        $svb->createSelectView($dir, $value);
+                        $tvb->createTableView($dir, $value);
                     }
+                    $hb = new HeaderBuilder;
+                    $hb->createHeader($dir, $arr, $info);
+                    $fb = new footerBuilder;
+                    $fb->createFooter($dir);
                  }
                 if(array_key_exists('routes', $json)){
                     $routes = new Routes($json['routes']['defaults'], $json['routes']['errorPage']);
@@ -93,7 +106,8 @@
          }
         private function createIndex($dir, $routes)
         {
-            $index = "<?php\n    require_once \"../autoload.php\";";
+            $index = "<?php\n    require_once \"../autoload.php\";".
+            "\trequire_once(\"header.php\");";
             if ($routes != null) {
                 $index.="\n    // \$routes = new Routes;\n    // if(\$_GET){\n    //     // var_dump(\$_GET);\n    //     \$routes->run(\$_GET['url']);\n    // }else {\n    //     echo \"empty\";\n    // }";
             }
