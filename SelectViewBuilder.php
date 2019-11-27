@@ -5,7 +5,11 @@
         {
             $issets = "";
             foreach ($table->getAtributes() as $key => $value) {
-                $issets .= "\t\t\$".$value->getName()." = isset(\$_POST['".$table->getName()."_".$value->getName()."'])?\$_POST['".$table->getName()."_".$value->getName()."']:\"\";\n";
+                if ($value->getForeignKey()=="") {
+                    $issets .= "\t\t\$".$value->getName()." = isset(\$_POST['".$table->getName()."_".$value->getName()."'])?\$_POST['".$table->getName()."_".$value->getName()."']:\"\";\n";
+                } else {
+                    $issets .= "\t\t\$".$value->getName()." = isset(\$_POST['".$value->getForeignKey()."_".$value->getName()."'])?\$_POST['".$value->getforeignKey()."_".$value->getName()."']:\"\";\n";
+                }
             }
             return $issets;
         }

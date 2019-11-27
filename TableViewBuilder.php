@@ -21,6 +21,36 @@
             }
             return $globalChanges;
         }
+        private function generateSelects($table)
+        {
+            $selecteds = "";
+            $pk = 1;
+            foreach ($table->getAtributes() as $key => $value) {
+                if ($value->getForeignKey()!="") {
+                    $selecteds .= 
+                    "\t\$pk".$pk." = selectPks".$pk."(\$".$value->getName().");\n".
+                    "\tfunction selectPks".$pk."(\$".$value->getName()."){\n".
+                    "\t\t\$pk = \n".
+                    "\t\t\"<select class=\\\"form-control\\\"name=\\\"".$value->getForeignKey()."_".$value->getName()."\\\" id=\\\"".$value->getForeignKey()."_".$value->getName()."\\\">\\n\".\n".
+                    "\t\t\":options\".\n".
+                    "\t\t\"</select>\";\n".
+                    "\t\t\$arr".ucfirst($value->getForeignKey())." = \$GLOBALS['control']->selectAll".ucfirst($value->getForeignKey())."();\n".
+                    "\t\t\$options = \"\";\n".
+                    "\t\tforeach (\$arr".ucfirst($value->getForeignKey())." as \$key => \$value) {\n".
+                    "\t\t\tif(\$value->get".ucfirst($value->getReference())."() == \$".$value->getName()."){\n".
+                    "\t\t\t\t\$options .= \"<option value=\\\"\".\$value->get".ucfirst($value->getReference())."().\"\\\" selected>\".\$value->get".ucfirst($value->getReference())."().\"</option>\\n\";\n".
+                    "\t\t\t }else{\n".
+                    "\t\t\t\t\$options .= \"<option value=\\\"\".\$value->get".ucfirst($value->getReference())."().\"\\\">\".\$value->get".ucfirst($value->getReference())."().\"</option>\\n\";\n".
+                    "\t\t\t  }\n".
+                    "\t\t }\n".
+                    "\t\t\$pk = str_replace(\":options\", \$options, \$pk);\n".
+                    "\t\treturn \$pk;\n".
+                    "\t }\n";
+                    $pk++;
+                }
+            }
+            return $selecteds;
+        }
         private function generatePhp($table)
         {
             $php = 
@@ -35,25 +65,12 @@
             "\t }else{\n".
             "\t\t\$action = \"Add\";\n".
             "\t  }\n".
-            "\t\$pk = selectPks();\n".
-            "\tfunction selectPks(){\n".
-            "\t\t\$pk = \n".
-            "\t\t\"<select class=\\\"form-control\\\"name=\\\"tabela_tabela2_id\\\" id=\\\"tabela_tabela2_id\\\">\\n\".\n".
-            "\t\t\":options\".\n".
-            "\t\t\"</select>\";\n".
-            "\t\t\$control = new Controller;\n".
-            "\t\t\$arrTabela2 = \$control->selectAllTabela2();\n".
-            "\t\t\$options = \"\";\n".
-            "\t\tforeach (\$arrTabela2 as \$key => \$value) {\n".
-            "\t\t\t\$options .= \"<option value=\\\"\".\$value->getId().\"\\\">\".\$value->getId().\"</option>\\n\";\n".
-            "\t\t }\n".
-            "\t\t\$pk = str_replace(\":options\", \$options, \$pk);\n".
-            "\t\treturn \$pk;\n".
-            "\t }\n".
+            ":selecteds".
             "\tfunction content(\$".$table->getName()."){\n".
             ":globalsChanges".
             "\t }\n";
             $php = str_replace(":issets", $this->generateIssets($table), $php);
+            $php = str_replace(":selecteds", $this->generateSelects($table), $php);
             $php = str_replace(":globalsChanges", $this->genareateGlobalsChanges($table), $php);
             return $php;
         }
@@ -61,6 +78,7 @@
         {
             $fields = "\t\t<div class=\"form-row\">\n";
             $atributes= $table->getAtributes();
+            $pk = 1;
             for ($i=0; $i < sizeof($atributes); $i++) { 
                 $fields .= 
                 "\t\t\t<div class=\"form-group col-md-4\">\n".
@@ -68,7 +86,8 @@
                 if($atributes[$i]->getForeignKey()==""){
                     $fields .= "\t\t\t\t<input type=\"text\" id=\"".$table->getName()."_".$atributes[$i]->getName()."\" name=\"".$table->getName()."_".$atributes[$i]->getName()."\" class=\"form-control\" placeholder=\"".ucfirst($atributes[$i]->getName())."\" value=\"<?= \$".$atributes[$i]->getName().";?>\">\n";
                 }else{
-                    $fields .= "\t\t\t\t<?= \$pk ?>\n";
+                    $fields .= "\t\t\t\t<?= \$pk".$pk." ?>\n";
+                    $pk++;
                 }
                 $fields .= "\t\t\t </div>\n";
                 if((($i+1)%3==0)&&!($i+1==sizeof($atributes))){
