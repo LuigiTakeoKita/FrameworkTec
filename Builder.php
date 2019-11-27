@@ -8,7 +8,7 @@
     require_once "DTOBuilder.php";
     require_once "DAOBuilder.php";
     require_once "BOBuilder.php";
-    require_once "SQLReader.php";
+    require_once "SqlReader.php";
     require_once "InterfaceBuilder.php";
     require_once "ControllerBuilder.php";
     require_once "HeaderBuilder.php";
@@ -19,7 +19,7 @@
     {
         public function init()
         {
-            if(file_exists('builder.json')){
+            if(file_exists(getcwd().DIRECTORY_SEPARATOR.'builder.json')){
                 $fjosn = file_get_contents('builder.json', 'r');
                 $json = json_decode($fjosn, true);
                 $info = new Informations($json['projectName'], $json['description']);
@@ -106,15 +106,28 @@
          }
         private function createIndex($dir, $routes)
         {
-            $index = "<?php\n    require_once \"../autoload.php\";".
-            "\trequire_once(\"header.php\");";
+            $index = 
+            "<?php\n".
+            "\trequire_once \"../autoload.php\";".
+            "\trequire_once(\"header.php\");\n";
             if ($routes != null) {
-                $index.="\n    // \$routes = new Routes;\n    // if(\$_GET){\n    //     // var_dump(\$_GET);\n    //     \$routes->run(\$_GET['url']);\n    // }else {\n    //     echo \"empty\";\n    // }";
+                $index .="\t\$routes = new Routes;\n".
+                "\tif(\$_GET){\n".
+                "\t\t\$routes->run(\$_GET['url']);\n".
+                "\t }else {\n".
+                "\t\techo \"empty\";\n".
+                "\t  }";
             }
-            $index .="\n    \$control = new Controller;\n    \$pdo = null;".
-            "\n    \$pdo = \$control->getPdo();".
-            "\n    if(\$pdo != null){".
-            "\n        echo \"Funcionou\";\n    }else {\n        echo \"Falhou\";\n    }\n?>";
+            $index .=
+            "\t\$control = new Controller;\n".
+            "\t\$pdo = null;\n".
+            "\t\$pdo = \$control->getPdo();\n".
+            "\tif(\$pdo != null){\n".
+            "\t\techo \"Funcionou\";\n".
+            "\t }else {\n".
+            "\t\techo \"Falhou\";\n".
+            "\t  }\n".
+            " ?>";
             $fp = fopen($dir.'view'.DIRECTORY_SEPARATOR.'index.php', 'w');
             fwrite($fp, $index);
             fclose($fp);
