@@ -131,8 +131,9 @@
                  } else {
                     $sets .= 
                     $tabs."\$".$value->getForeignKey()." = new ".ucfirst($value->getForeignKey()).";\n".
-                    $tabs."\$".$value->getForeignKey()."->set".$value->getReference()."(\$row['".$value->getName()."']);\n".
-                    $tabs."\$".$value->getForeignKey()." = \$".$value->getForeignKey()."dao->selectPK(\$".$value->getForeignKey().");\n".
+                    $tabs."\$".$value->getForeignKey()."->set".ucfirst($value->getReference())."(\$row['".$value->getName()."']);\n".
+                    $tabs."\$control = new Controller;\n".
+                    $tabs."\$".$value->getForeignKey()." = \$control->selectPK".ucfirst($value->getForeignKey())."(\$".$value->getForeignKey().");\n".
                     $tabs."\$".$name."->set".ucfirst($value->getForeignKey())."(\$".$value->getForeignKey().");\n";
                   }
                 

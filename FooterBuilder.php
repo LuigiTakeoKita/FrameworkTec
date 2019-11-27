@@ -4,7 +4,7 @@
         public function createFooter($dir)
         {
             $footer =
-            "\t\t<script src=\"https://code.jquery.com/jquery.js\"></script>\n".
+            // "\t\t<script src=\"https://code.jquery.com/jquery.js\"></script>\n".
             // "\t\t<script src=\"js/bootstrap.min.js\"></script>\n".
             "\t</body>\n".
             "</html>";

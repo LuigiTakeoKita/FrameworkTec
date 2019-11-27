@@ -75,7 +75,7 @@
                     "\t\t\treturn \$this->".$value->getName()."DAO->selectAll();\n".
                     "\t\t }\n".
                     "\t\tpublic function selectPK".ucfirst($value->getName())."(\$".$value->getName()." = null) {\n".
-                    "\t\t\treturn \$this->".$value->getName()."DAO->selectPK".ucfirst($value->getName())."(\$".$value->getName().");\n".
+                    "\t\t\treturn \$this->".$value->getName()."DAO->selectPK(\$".$value->getName().");\n".
                     "\t\t }\n";
                  }
              }

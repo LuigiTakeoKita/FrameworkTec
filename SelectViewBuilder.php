@@ -1,11 +1,11 @@
 <?php
     class SelectViewBuilder
     {
-        private function generateIssets($atributes)
+        private function generateIssets($table)
         {
             $issets = "";
-            foreach ($atributes as $key => $value) {
-                $issets .= "\t\t\$".$value->getName()." = isset(\$_POST['".$value->getName()."'])?\$_POST['".$value->getName()."']:\"\";\n";
+            foreach ($table->getAtributes() as $key => $value) {
+                $issets .= "\t\t\$".$value->getName()." = isset(\$_POST['".$table->getName()."_".$value->getName()."'])?\$_POST['".$table->getName()."_".$value->getName()."']:\"\";\n";
             }
             return $issets;
         }
@@ -56,7 +56,7 @@
             "\t }\n".
             "\t\$a".ucfirst($table->getName())." = \$control->selectAll".ucfirst($table->getName())."();\n".
             "\t\$t=\"\";\n".
-            "\t\tif (sizeof(\$a".ucfirst($table->getName()).")>0) {\n".
+            "\tif (sizeof(\$a".ucfirst($table->getName()).")>0) {\n".
             "\t\t\$t=tabela(\$a".ucfirst($table->getName()).");\n".
             "\t }\n".
             "\tfunction tabela(\$a".ucfirst($table->getName())."){\n".
@@ -64,19 +64,19 @@
             "\t\tforeach (\$a".ucfirst($table->getName())." as \$key => \$value) {\n".
             "\t\t\t\$t .= \"<tr>\". \n".
             ":tds".
-            "\t\t\t\"<td><input type='button' onclick='".$table->getAtributes()[0]->getName().".value=\".\$value->get".ucfirst($table->getAtributes()[0]->getName())."().\";return crud();' id='action' name='action' class='btn btn-primary' value='Update'></td>\".\n".
-            "\t\t\t\"<td><input type='submit' onclick='".$table->getAtributes()[0]->getName().".value=\".\$value->get".ucfirst($table->getAtributes()[0]->getName())."().\"' name='Delete' class='btn btn-danger' value='Delete'></td>\".\n".
+            "\t\t\t\"<td><input type='button' onclick='".$table->getName()."_".$table->getAtributes()[0]->getName().".value=\".\$value->get".ucfirst($table->getAtributes()[0]->getName())."().\";return crud();' id='action' name='action' class='btn btn-primary' value='Update'></td>\".\n".
+            "\t\t\t\"<td><input type='submit' onclick='".$table->getName()."_".$table->getAtributes()[0]->getName().".value=\".\$value->get".ucfirst($table->getAtributes()[0]->getName())."().\"' name='Delete' class='btn btn-danger' value='Delete'></td>\".\n".
             "\t\t\t\"</tr>\";\n".
             "\t\t }\n".
             "\t\treturn \$t;\n".
             "\t }\n".
             "\tfunction delete(){\n".
             "\t\t\$".$table->getName()." = new ".ucfirst($table->getName()).";\n".
-            "\t\t\$".$table->getName()."->set".ucfirst($table->getAtributes()[0]->getName())."(\$_POST['".$table->getAtributes()[0]->getName()."']);\n".
+            "\t\t\$".$table->getName()."->set".ucfirst($table->getAtributes()[0]->getName())."(\$_POST['".$table->getName()."_".$table->getAtributes()[0]->getName()."']);\n".
             "\t\t\$control = new Controller;\n".
             "\t\t\$control->delete".ucfirst($table->getName())."(\$".$table->getName().");\n".
             "\t }\n";
-            $php = str_replace(":issets", $this->generateIssets($table->getAtributes()), $php);
+            $php = str_replace(":issets", $this->generateIssets($table), $php);
             $php = str_replace(":sets", $this->generateSets($table), $php);
             $php = str_replace(":tds", $this->generateTds($table->getAtributes()), $php);
             return $php;
@@ -85,8 +85,11 @@
         {
             $ths = "";
             foreach ($atributes as $key => $value) {
-                $ths .= "\t\t\t\t\t\t<th>".ucfirst($value->getName())."</th>\n";
+                $ths .= "\t\t\t\t\t<th>".ucfirst($value->getName())."</th>\n";
             }
+            $ths .=
+            "\t\t\t\t\t<th>Update</th>\n".
+            "\t\t\t\t\t<th>Delete</th>\n";
             return $ths;
         }
         public function createSelectView($dir, $table)
@@ -98,6 +101,8 @@
             ":php".
             " ?>\n".
             "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js\"></script>\n".
+            "<link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css\">\n".
+            "<script type=\"text/javascript\" charset=\"utf8\" src=\"https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js\"></script>\n".
             "<script>\n".
             "\tfunction crud(){\n".
 	    	"\t\tdocument.Form.action=\"".$table->getName()."TableView.php\";\n".
@@ -107,24 +112,22 @@
             " </script>\n".
             "<div class=\"container\">\n".
             "\t<form method=\"post\" name=\"Form\">\n".
-            "\t\t<legend>Tecidos</legend>\n".
+            "\t\t<legend>".ucfirst($table->getName())."</legend>\n".
             "\t\t<div class=\"form-row\">\n".
-            "\t\t\t<input type=\"hidden\" id=\"".$table->getAtributes()[0]->getName()."\" name=\"".$table->getAtributes()[0]->getName()."\">\n".
+            "\t\t\t<input type=\"hidden\" id=\"".$table->getName()."_".$table->getAtributes()[0]->getName()."\" name=\"".$table->getName()."_".$table->getAtributes()[0]->getName()."\">\n".
             "\t\t\t<input type='button' onclick='return crud();' name='action' class='btn btn-primary' value='Add'>\n".
             "\t\t </div>\n".
             "\t\t<br>\n".
-            "\t\t<div class=\"form-row\">\n".
-            "\t\t\t<table id=\"table\">\n".
-            "\t\t\t\t<thead>\n".
-            "\t\t\t\t\t<tr>\n".
+            "\t\t<table id=\"table\">\n".
+            "\t\t\t<thead>\n".
+            "\t\t\t\t<tr>\n".
             ":ths".
-            "\t\t\t\t\t </tr>\n".
-            "\t\t\t\t </thead>\n".
-            "\t\t\t\t<tbody>\n".
-            "\t\t\t\t\t<?= \$t?>\n".
-            "\t\t\t\t </tbody>\n".
+            "\t\t\t\t </tr>\n".
+            "\t\t\t </thead>\n".
+            "\t\t\t<tbody>\n".
+            "\t\t\t\t<?= \$t?>\n".
+            "\t\t\t </tbody>\n".
             "\t\t\t </table>\n".
-            "\t\t </div>\n".
             "\t </form>\n".
             " </div>\n".
             "<script>\n".
