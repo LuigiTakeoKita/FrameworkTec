@@ -15,9 +15,9 @@
     },
     "routes":{
         "defaults":{
-            "test": "teste",
-            "test/:int": "testeInt",
-            "test/:string": "testeString"
+            "test": ["Controller", "teste"],
+            "test/:int": ["Controller", "testeInt"],
+            "test/:string": ["Controller", "testeString"]
         },
         "errorPage": "http://localhost/Projetos/ComposerTests/view/404.php"
     },
